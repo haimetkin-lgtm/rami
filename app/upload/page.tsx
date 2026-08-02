@@ -112,7 +112,7 @@ function UploadContent() {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
       <h1 className="text-xl font-bold text-[#123640] mb-1">העלאת מסמכים</h1>
-      <p className="text-sm text-gray-500 mb-6">שני קבצים: השומה מרמ&quot;י, ומכתב ההשגה</p>
+      <p className="text-sm text-gray-500 mb-6">שני קבצים: השומה מרמ&quot;י, ומכתב הדרישה מרמ&quot;י</p>
 
       <div className="space-y-4 mb-4">
         <div>
@@ -125,7 +125,7 @@ function UploadContent() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">מכתב ההשגה</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">מכתב הדרישה מרמ&quot;י</label>
           <input
             type="file"
             accept="application/pdf,image/*"

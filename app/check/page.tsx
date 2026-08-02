@@ -145,7 +145,7 @@ export default function CheckPage() {
           <div className="text-sm text-gray-600 mb-1">יישוב</div>
           <div className="font-bold text-[#123640] mb-3">{lookup.yishuv}</div>
           <div className="bg-[#eaf2f3] rounded-lg px-3 py-2 text-sm text-[#123640] mb-4">
-            נמצאו <strong>{lookup.count.toLocaleString("he-IL")}</strong> הכרעות ועדת השגות במאגר עבור יישוב זה.
+            נמצאו <strong>{lookup.count.toLocaleString("he-IL")}</strong> החלטות ועדת השגות במאגר עבור יישוב זה.
           </div>
           <div className="text-2xl font-bold text-[#1a4d5c] mb-4">{PRICE_NIS.toLocaleString("he-IL")} ₪</div>
 

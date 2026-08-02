@@ -15,7 +15,7 @@ create table if not exists rami_yishuvim (
   updated_at timestamptz not null default now()
 );
 
--- הכרעות ועדת השגות
+-- החלטות ועדת השגות
 create table if not exists rami_decisions (
   id uuid primary key default gen_random_uuid(),
   yishuv_id uuid references rami_yishuvim(id) on delete cascade,
@@ -26,8 +26,7 @@ create table if not exists rami_decisions (
   plot text,
   property_primary_class text,
   property_secondary_class text,
-  district_appraiser text,
-  decisive_appraiser text,
+  objector_name text,
   decision_date date,
   pdf_url text not null,
   status text not null default 'pending' check (status in ('pending', 'classified', 'failed')),
@@ -37,7 +36,7 @@ create table if not exists rami_decisions (
   geo_x double precision,
   geo_y double precision,
   created_at timestamptz not null default now(),
-  unique (title, pdf_url)
+  unique (title, decision_date)
 );
 
 create index if not exists idx_rami_decisions_yishuv on rami_decisions(yishuv_id);
