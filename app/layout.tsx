@@ -87,6 +87,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <br />
           © {new Date().getFullYear()} כל הזכויות שמורות · ט.ל.ח
         </footer>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-2ESYFTH5RJ" strategy="afterInteractive" />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-2ESYFTH5RJ');`}
+        </Script>
         <Script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js" strategy="afterInteractive" />
         <Script
           id="free_accessibility_plugin_script"
