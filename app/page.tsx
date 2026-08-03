@@ -120,6 +120,13 @@ export default function Home() {
         </p>
       </section>
 
+      <section className="text-center text-sm text-gray-500 mb-10">
+        <p>
+          המועדים להשגה על שומת רמ&quot;י קצרים, והם כתובים בהודעה שקיבלת שצורפה לשומה. אל תמתין
+          לסוף התקופה.
+        </p>
+      </section>
+
       <section>
         <h2 className="font-bold text-[#123640] mb-3 text-center">שאלות נפוצות</h2>
         <div className="space-y-3">
