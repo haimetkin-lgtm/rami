@@ -15,11 +15,14 @@ create table if not exists rami_yishuvim (
   updated_at timestamptz not null default now()
 );
 
--- החלטות ועדת השגות
+-- החלטות. instance מבחין בין שתי ערכאות שונות מהותית: 'committee' = ועדת השגות
+-- (3 חברים, השגה שנייה, decisions_appeals_board) ו-'first' = הכרעה בהשגה ראשונה
+-- (שמאי בודד, committee endpoint) — שני מבני מסמך שונים, סכמות סיווג נפרדות
 create table if not exists rami_decisions (
   id uuid primary key default gen_random_uuid(),
   yishuv_id uuid references rami_yishuvim(id) on delete cascade,
   yishuv_name text not null,
+  instance text not null default 'committee' check (instance in ('committee', 'first')),
   title text not null,
   case_number text,
   block text,
@@ -36,16 +39,18 @@ create table if not exists rami_decisions (
   geo_x double precision,
   geo_y double precision,
   created_at timestamptz not null default now(),
-  unique (title, decision_date)
+  unique (title, decision_date, instance)
 );
 
 create index if not exists idx_rami_decisions_yishuv on rami_decisions(yishuv_id);
 create index if not exists idx_rami_decisions_status on rami_decisions(status);
 
--- אצוות סיווג
+-- אצוות סיווג. instance כאן כדי שהבליעה (poll-batches) תדע איזו סכמת נורמליזציה/linter
+-- להפעיל על התוצאות, בלי לשלוף כל החלטה בנפרד כדי לבדוק
 create table if not exists rami_classification_batches (
   id uuid primary key default gen_random_uuid(),
   yishuv_id uuid references rami_yishuvim(id) on delete cascade,
+  instance text not null default 'committee' check (instance in ('committee', 'first')),
   anthropic_batch_id text not null,
   status text not null default 'submitted' check (status in ('submitted', 'processing', 'ended', 'ingested', 'error')),
   decision_ids uuid[] not null,
