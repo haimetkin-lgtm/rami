@@ -54,3 +54,29 @@ export interface Stage2CaseRow {
 
 export const PRICE_NIS = 480;
 export const STAGE2_PRICE_NIS = 1400;
+
+// כתובת שרת התשלום והדוחות. חייבת להיות www: הכתובת בלי www מפנה (308), ודפדפן דוחה בקשת preflight שמקבלת הפניה.
+export const DECISIONS_API = "https://www.insure.co.il/api/decisions";
+
+// הקריאה לתיקים נעשית דרך פונקציות מוגבלות במסד הנתונים (לפי מזהה התיק בלבד), לא דרך גישה ישירה לטבלה.
+export async function getCase(id: string): Promise<CaseRow | null> {
+  const { data, error } = await supabase.rpc("rami_get_case", { p_id: id });
+  return error || !data ? null : (data as CaseRow);
+}
+
+export async function getStage2Case(id: string): Promise<Stage2CaseRow | null> {
+  const { data, error } = await supabase.rpc("rami_get_stage2_case", { p_id: id });
+  return error || !data ? null : (data as Stage2CaseRow);
+}
+
+// יוצר דף תשלום בשרת. הסכום נקבע שם לפי נתוני התיק, לא לפי מה שהדפדפן שולח.
+export async function startCheckout(kind: "stage1" | "stage2", caseId: string): Promise<string> {
+  const res = await fetch(`${DECISIONS_API}/checkout`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ product: "rami", kind, case_id: caseId }),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok || !body.payment_url) throw new Error(body.error || "checkout_failed");
+  return body.payment_url as string;
+}

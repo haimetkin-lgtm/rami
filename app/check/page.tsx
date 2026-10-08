@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase, supabaseConfigured, PRICE_NIS } from "@/lib/supabase";
-
-const CARDCOM_LINK = process.env.NEXT_PUBLIC_CARDCOM_LINK_TIER1;
+import { supabase, supabaseConfigured, PRICE_NIS, startCheckout } from "@/lib/supabase";
 
 type Lookup =
   | { state: "idle" }
@@ -58,17 +56,16 @@ export default function CheckPage() {
       setError("נא להזין טלפון או אימייל לקבלת הדוח");
       return;
     }
-    if (!CARDCOM_LINK) {
-      setError("התשלום המקוון עדיין לא מוגדר. אנא צרו קשר בוואטסאפ.");
-      return;
-    }
-
     setSubmitting(true);
     setError(null);
     try {
-      const { data, error: insertError } = await supabase
+      // המזהה נוצר כאן כדי שלא נצטרך לקרוא את השורה בחזרה (קריאה ישירה לטבלה סגורה לציבור).
+      // המחיר האמיתי נקבע בשרת בעת יצירת דף התשלום, הערך כאן נשמר רק לתיעוד.
+      const caseId = crypto.randomUUID();
+      const { error: insertError } = await supabase
         .from("rami_cases")
         .insert({
+          id: caseId,
           yishuv_name: lookup.yishuv,
           block: block.trim(),
           plot: plot.trim(),
@@ -78,17 +75,11 @@ export default function CheckPage() {
           price_nis: PRICE_NIS,
           paid: false,
           status: "pending_payment",
-        })
-        .select("id")
-        .single();
+        });
 
-      if (insertError || !data) throw insertError ?? new Error("insert failed");
+      if (insertError) throw insertError;
 
-      const siteUrl = "https://haimetkin-lgtm.github.io/rami";
-      const url = new URL(CARDCOM_LINK);
-      url.searchParams.set("SuccessRedirectUrl", `${siteUrl}/report/?case=${data.id}`);
-      url.searchParams.set("FailedRedirectUrl", `${siteUrl}/check/?payment=failed`);
-      window.location.href = url.toString();
+      window.location.href = await startCheckout("stage1", caseId);
     } catch {
       setError("אירעה שגיאה. נסו שוב, או צרו קשר בוואטסאפ.");
       setSubmitting(false);
