@@ -10,6 +10,16 @@ const BASE = "/rami";
 const WA = "972523728828";
 const fmt = (n: number) => n.toLocaleString("he-IL");
 
+// הטקסטים מהשרת משותפים לשני האתרים ומדברים על ועדות. ברמ"י ההחלטות ממוינות לפי יישובים.
+const YISHUVIM: [string, string][] = [
+  ["בוועדות שבחרתם", "ביישובים שבחרתם"],
+  ["לוועדה או ליישוב שחסר", "ליישוב שחסר"],
+  ["בעד 15 ועדות", "בעד 15 יישובים"],
+  ["סוגיה, ועדה ושמאי", "סוגיה, יישוב ושמאי"],
+  ["בכל הוועדות", "בכל היישובים"],
+];
+const toYishuvim = (text: string) => YISHUVIM.reduce((t, [a, b]) => t.split(a).join(b), text);
+
 const ERRORS: Record<string, string> = {
   already_subscribed: "כבר יש לכם מנוי פעיל מהסוג הזה. ניתן לראות אותו באזור האישי.",
   email_not_confirmed: "כתובת האימייל עדיין לא אומתה. אמתו אותה דרך המייל שנשלח אליכם ונסו שוב.",
@@ -129,7 +139,7 @@ export default function SubscribePage() {
               )}
 
               <ul className="text-sm text-gray-700 space-y-1 mb-4 list-disc pr-5">
-                {p.features.map((f) => (
+                {p.features.map((f) => toYishuvim(f)).map((f) => (
                   <li key={f}>{f}</li>
                 ))}
               </ul>
