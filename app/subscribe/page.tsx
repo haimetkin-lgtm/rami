@@ -109,7 +109,7 @@ export default function SubscribePage() {
             <div key={p.key} className={`bg-white border rounded-xl p-5 shadow-sm ${p.key === "regular" ? "border-[#1a4d5c]" : "border-gray-200"}`}>
               <div className="flex items-baseline justify-between gap-3 mb-1">
                 <h2 className="font-bold text-[#123640]">{p.key === "appraiser" ? "מנוי לשמאי מחוזי" : p.name}</h2>
-                <span className="text-xs text-gray-500">{p.key === "appraiser" ? "שמאי מחוזי" : p.audience}</span>
+                <span className="text-xs text-gray-500">{p.key === "appraiser" ? "שמאי מחוזי" : p.key === "org" ? "ועדה מחוזית, עירייה, גוף גדול" : p.audience}</span>
               </div>
 
               {p.availability === "available" && (
