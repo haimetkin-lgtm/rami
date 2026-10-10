@@ -144,6 +144,27 @@ export async function openSubscriberCheck(
   return { caseId: r.body.case_id as string, remaining: r.body.remaining as number };
 }
 
+// פותח עיקרי דברים על חשבון המנוי (מנצל אחד מהמכסה החודשית). משם ממשיכים להעלאת המסמכים כמו אחרי תשלום רגיל.
+export async function openSubscriberStage2(
+  token: string,
+  input: { stage1CaseId?: string; yishuv?: string }
+): Promise<{ case2Id: string; remaining: number }> {
+  const r = await authedPost("/subscriber/stage2", token, {
+    product: "rami",
+    stage1_case_id: input.stage1CaseId,
+    yishuv_name: input.yishuv,
+  });
+  if (!r.ok || !r.body.case2_id) throw new Error(r.body.error || "open_failed");
+  return { case2Id: r.body.case2_id as string, remaining: r.body.remaining as number };
+}
+
+// מנוי פעיל שמכסה את רמ"י ועדיין יש בו עיקרי דברים החודש
+export function usableStage2ForRami(subs: MySubscription[]): MySubscription | null {
+  return (
+    subs.find((s) => (s.products === "rami" || s.products === "both") && s.usage_stage2 < s.stage2_per_month) ?? null
+  );
+}
+
 // זוכר לאן לחזור אחרי התחברות (כולל חזרה מגוגל)
 const NEXT_KEY = "hh_after_login";
 export function rememberNext(path: string) {
