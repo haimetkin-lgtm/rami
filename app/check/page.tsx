@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase, supabaseConfigured, PRICE_NIS, startCheckout } from "@/lib/supabase";
+import { useSession, getMySubscriptions, usableForRami, openSubscriberCheck, rememberNext, type MySubscription } from "@/lib/subscriptions";
 
 type Lookup =
   | { state: "idle" }
@@ -10,6 +12,14 @@ type Lookup =
   | { state: "found"; yishuv: string; count: number; classified: boolean };
 
 export default function CheckPage() {
+  const router = useRouter();
+  const { session } = useSession();
+  const [subscription, setSubscription] = useState<MySubscription | null>(null);
+  const [subscribing, setSubscribing] = useState(false);
+  useEffect(() => {
+    if (!session) { setSubscription(null); return; }
+    getMySubscriptions().then((list) => setSubscription(usableForRami(list)));
+  }, [session]);
   const [yishuvInput, setYishuvInput] = useState("");
   const [lookup, setLookup] = useState<Lookup>({ state: "idle" });
   const [block, setBlock] = useState("");
@@ -48,6 +58,32 @@ export default function CheckPage() {
     }
 
     setLookup({ state: "found", yishuv: data.name, count: data.decisions_count, classified: data.classified });
+  }
+
+  // בדיקה על חשבון המנוי: מנצלת בדיקה אחת מהמכסה, בלי תשלום
+  async function handleSubscriberOpen() {
+    if (lookup.state !== "found" || !session) return;
+    setSubscribing(true);
+    setError(null);
+    try {
+      const { caseId } = await openSubscriberCheck(session.access_token, {
+        yishuv: lookup.yishuv,
+        block: block.trim(),
+        plot: plot.trim(),
+        name: contactName.trim() || undefined,
+        phone: contactPhone.trim() || undefined,
+        email: contactEmail.trim() || undefined,
+      });
+      router.push(`/report/?case=${caseId}`);
+    } catch (e) {
+      const code = (e as Error).message;
+      setError(
+        code === "quota_exceeded"
+          ? "המכסה החודשית נוצלה. אפשר לשלם על הבדיקה הזו בנפרד."
+          : "לא הצלחנו לפתוח את הבדיקה על חשבון המנוי. נסו שוב, או שלמו על הבדיקה בנפרד."
+      );
+      setSubscribing(false);
+    }
   }
 
   async function handlePay() {
@@ -173,6 +209,29 @@ export default function CheckPage() {
           )}
 
           {error && <p className="text-sm text-[#8a2f22] mb-3">{error}</p>}
+
+          {subscription ? (
+            <div className="bg-[#eef7f1] border border-[#bfdcc9] rounded-lg p-3 mb-3">
+              <div className="text-sm text-[#256f46] mb-2">
+                יש לכם מנוי פעיל: נותרו <strong>{subscription.checks_per_month - subscription.usage_checks}</strong> בדיקות החודש.
+              </div>
+              <button
+                onClick={handleSubscriberOpen}
+                disabled={subscribing || submitting}
+                className="w-full bg-[#2e8b57] text-white font-bold py-3 rounded-lg hover:bg-[#256f46] disabled:opacity-50 cursor-pointer disabled:cursor-default"
+              >
+                {subscribing ? "פותח את הבדיקה..." : "פתיחת הבדיקה על חשבון המנוי"}
+              </button>
+            </div>
+          ) : !session ? (
+            <p className="text-xs text-gray-500 mb-3">
+              מנויים?{" "}
+              <a href="/rami/login/" onClick={() => rememberNext("/check/")} className="text-[#1a4d5c] underline">
+                התחברו
+              </a>{" "}
+              כדי לפתוח בדיקות על חשבון המנוי, בלי לשלם בכל פעם.
+            </p>
+          ) : null}
 
           <button
             onClick={handlePay}

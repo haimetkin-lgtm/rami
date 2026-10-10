@@ -1,3 +1,5 @@
+import SubscriberLinks from "@/components/SubscriberLinks";
+
 const FAQ = [
   {
     q: "מה זו ועדת השגות על שומות רמ\"י?",
@@ -82,6 +84,8 @@ export default function Home() {
         >
           כבר יש לך שומה ומכתב דרישה מרמ&quot;י ביד? <strong>רוצה לדלג ישר לבדיקה המלאה?</strong>
         </a>
+        <p className="text-sm text-gray-600 mt-5 mb-0">בודקים הרבה? עורכי דין, שמאים ומשרדים עובדים עם מנוי שנתי:</p>
+        <SubscriberLinks variant="hero" />
       </section>
 
       <section className="grid sm:grid-cols-3 gap-4 mb-10">
