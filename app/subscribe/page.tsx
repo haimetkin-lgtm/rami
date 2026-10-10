@@ -108,8 +108,8 @@ export default function SubscribePage() {
           return (
             <div key={p.key} className={`bg-white border rounded-xl p-5 shadow-sm ${p.key === "regular" ? "border-[#1a4d5c]" : "border-gray-200"}`}>
               <div className="flex items-baseline justify-between gap-3 mb-1">
-                <h2 className="font-bold text-[#123640]">{p.name}</h2>
-                <span className="text-xs text-gray-500">{p.audience}</span>
+                <h2 className="font-bold text-[#123640]">{p.key === "appraiser" ? "מנוי לשמאי מחוזי" : p.name}</h2>
+                <span className="text-xs text-gray-500">{p.key === "appraiser" ? "שמאי מחוזי" : p.audience}</span>
               </div>
 
               {p.availability === "available" && (
@@ -126,9 +126,6 @@ export default function SubscribePage() {
                 <div className="mb-3 text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
                   בקרוב. החבילה תיפתח כשיושלם מנוע החיפוש בהחלטות. מחיר צפוי: {fmt(price.installmentsMonthlyNis)} ₪ לחודש.
                 </div>
-              )}
-              {p.availability === "quote" && (
-                <div className="mb-3 text-sm text-gray-600">מחיר לפי הצעה, החל מ-{fmt(p.prices.machria.installmentsMonthlyNis)} ₪ לחודש.</div>
               )}
 
               <ul className="text-sm text-gray-700 space-y-1 mb-4 list-disc pr-5">

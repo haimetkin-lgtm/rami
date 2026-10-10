@@ -49,7 +49,7 @@ export interface MySubscription {
 export const PLAN_NAMES: Record<PlanKey, string> = {
   regular: "מנוי רגיל",
   office: "מנוי משרדי",
-  appraiser: "מנוי לשמאי מכריע",
+  appraiser: "מנוי לשמאי מחוזי",
   org: "מנוי לוועדה או ארגון",
 };
 
